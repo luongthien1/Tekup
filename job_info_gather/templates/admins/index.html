@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Website Crawler</h1>
+    <form action="/admins/crawl" class="API_function" method="post">
+        {% csrf_token %}
+        <h2>Input</h2>
+        <div style="display:flex">
+            <label style="flex: 1;">Website URL</label>
+            <input style="flex: 6;" name="website_url" placeholder="website_url">
+        </div>
+        <div style="display:flex">
+            <label style="flex: 1;">selector</label>
+            <input style="flex: 6;" name="selector" placeholder="selector">
+        </div>
+        <div style="display:flex">
+            <label style="flex: 1;">info url selector</label>
+            <input style="flex: 6;" name="info_url_selector" placeholder="info url selector">
+        </div>
+        <div style="display:flex">
+            <label style="flex: 1;">show more mode</label>
+            <select style="flex: 6;" name="show_more_mode">
+                {% for show_more_mode in show_more_options %}
+                    <option value="{{ show_more_mode }}">{{ show_more_mode }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display:flex">
+            <label style="flex: 1;">max post number</label>
+            <input style="flex: 6;" name="max_post_number" placeholder="max post number">
+        </div>
+        <input name="action" value="crawl" hidden>
+        <div>
+            <button type="submit">Crawl</button>
+        </div>
+    </form>
+    <div>
+        <form id="output">
+            <h2>Output</h2>
+            <div style="display:flex">
+                <label style="flex: 1;">Job Title</label>
+                <textarea  style="flex: 6;" name="job_title" value="job_title"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Job Description</label>
+                <textarea  style="flex: 6;" name="job_description" value="job_description"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Job Location</label>
+                <textarea  style="flex: 6;" name="job_location" value="job_location"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Company name</label>
+                <textarea  style="flex: 6;" name="company_name" value="company_name"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Job Salary</label>
+                <textarea  style="flex: 6;" name="job_salary" value="job_salary"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Job Requirement</label>
+                <textarea  style="flex: 6;" name="job_requirement" value="job_requirement"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Job Posted Date</label>
+                <textarea  style="flex: 6;" name="job_posted_date" value="job_posted_date"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Job Expired Date</label>
+                <textarea  style="flex: 6;" name="job_expired_date" value="job_expired_date"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Contact name</label>
+                <textarea  style="flex: 6;" name="contact_name"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Contact phone</label>
+                <textarea  style="flex: 6;" name="contact_phone"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Contact address</label>
+                <textarea  style="flex: 6;" name="contact_address"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Source link</label>
+                <textarea  style="flex: 6;" name="source_link"></textarea>
+            </div>
+            <div style="display:flex">
+                <label style="flex: 1;">Encode content hash</label>
+                <textarea  style="flex: 6;" name="encode_content_hash"></textarea>
+            </div>
+        </form>
+    </div>
+    <h1>Database</h1>
+    <form action="/admins/get" method="get">
+        <label>Website</label>
+        <select name="website" id="website" class="API_function">
+            {% for website in websites %}
+                <option value="{{ website.id }}">{{ website.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+    <div>
+        <label>Job Title</label>
+        <input name="job_title" value="job_title">
+        <label>Job Description</label>
+        <input name="job_description" value="job_description">
+        <label>Job Location</label>
+        <input name="job_location" value="job_location">
+        <label>Company name</label>
+        <input name="company_name" value="company_name">
+        <label>Job Salary</label>
+        <input name="job_salary" value="job_salary">
+        <label>Job Requirement</label>
+        <input name="job_requirement" value="job_requirement">
+        <label>Job Posted Date</label>
+        <input name="job_posted_date" value="job_posted_date">
+        <label>Job Expired Date</label>
+        <input name="job_expired_date" value="job_expired_date">
+        <label>Contact name</label>
+        <input name="contact_name">
+        <label>Contact phone</label>
+        <input name="contact_phone">
+        <label>Contact address</label>
+        <input name="contact_address">
+        <label>Source link</label>
+        <input name="source_link">
+        <label>Encode content hash</label>
+        <input name="encode_content_hash">
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        api_els = $(".API_function");
+        for (let index = 0; index < api_els.length; index++) {
+            $(api_els[index]).on("submit", function(e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: $(api_els[index]).attr("action"),
+                    data: $(api_els[index]).serialize(),
+                    success: function (response) {
+                        results = response.results;
+                        
+                        for (let i in results) {
+                            result = results[i];
+                            for (const key in result) {
+                                const value = result[key];
+                                console.log(value);
+                                $(`form#output`).find(`textarea[name=${key}]`).val(value);
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
